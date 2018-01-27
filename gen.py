@@ -4,20 +4,22 @@ import math
 
 fout = open('model.inp', 'w')
 
-rings = 18
-el_per_ring = 16
+height = 16
+rings = 9
+el_per_ring = 8
 r_del = 2 * math.pi / el_per_ring
 
 nodes = []
 elements = []
 
+# horizontal trunk segments
 for i in range(rings):
 
-    d1 = 2
-    d2 = 4./3
+    d1 = 4./3
+    d2 = 2
 
-    z = i * 2./3
-    r = d1 + (d1 - d2) / (1 + math.exp(2./3 * i - 6))
+    z = i * float(height) / rings
+    r = d1 + (d2 - d1) / (1 + math.exp((12./rings) * i - 6))
 
     for j in range(el_per_ring):
 
@@ -47,6 +49,7 @@ for i in range(rings):
             n3 = n2 + 1
         elements.append([n1, n2, n3])
 
+# diagonal trunk segments
 for i in range(rings - 1):
 
     for j in range(el_per_ring):
@@ -73,6 +76,12 @@ for i in range(rings - 1):
 
         elements.append([n1, len(nodes) - 2, n2])
         elements.append([n1, len(nodes) - 1, n3])
+
+# roots
+r1
+nodes.append([])
+
+# midgard
 
 fout.write('*NODE,NSET=Nall\n')
 for i, node in enumerate(nodes):
