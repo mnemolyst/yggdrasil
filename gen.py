@@ -4,7 +4,7 @@ import math
 
 fout = open('model.inp', 'w')
 
-height = 16
+height = 16 #feet
 rings = 9
 el_per_ring = 8
 r_del = 2 * math.pi / el_per_ring
@@ -12,14 +12,25 @@ r_del = 2 * math.pi / el_per_ring
 nodes = []
 elements = []
 
+r1 = 4./3
+r2 = 2
+r3 = 4.5
+r_mid = 6
+
+def trunk_rad(i):
+    if i < 5:
+        return r2
+    else:
+        return r1
+
 # horizontal trunk segments
 for i in range(rings):
 
-    d1 = 4./3
-    d2 = 2
-
     z = i * float(height) / rings
-    r = d1 + (d2 - d1) / (1 + math.exp((12./rings) * i - 6))
+    # this is a logistic function for smooth tapering
+    #r = r1 + (r2 - r1) / (1 + math.exp((12./rings) * i - 6))
+    # this is a step function for easy construction
+    r = trunk_rad(i)
 
     for j in range(el_per_ring):
 
@@ -78,10 +89,19 @@ for i in range(rings - 1):
         elements.append([n1, len(nodes) - 1, n3])
 
 # roots
-r1
-nodes.append([])
+for n in [32, 36, 40, 44]:
+    r12dl = math.sqrt(nodes[n][0] ** 2 + nodes[n][1] ** 2)
+    r12dn = [nodes[n][0] / r12dl * r_mid, nodes[n][1] / r12dl * r_mid, 0]
+    r1m = [(nodes[n][0] + r12dn[0]) / 2, (nodes[n][1] + r12dn[1]) / 2, (nodes[n][2] + r12dn[2]) / 2]
+    nodes.append(r1m)
+    nodes.append(r12dn)
+    elements.append([n, len(nodes) - 2, len(nodes) - 1])
 
 # midgard
+p1 = nodes[68]
+p2 = nodes[74]
+p3 = [-r_mid, 0, nodes[68][2]]
+
 
 fout.write('*NODE,NSET=Nall\n')
 for i, node in enumerate(nodes):
