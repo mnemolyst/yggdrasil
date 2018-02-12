@@ -12,10 +12,10 @@ r_del = 2 * math.pi / el_per_ring
 nodes = []
 elements = []
 
-r1 = 4./3
-r2 = 2
+r1 = 2
+r2 = 3
 r3 = 4.5
-r_mid = 6
+r_mid = 8
 
 def trunk_rad(i):
     if i < 5:
@@ -34,9 +34,7 @@ for i in range(rings):
 
     for j in range(el_per_ring):
 
-        r_this = j * r_del
-        if i % 2 == 0:
-            r_this += r_del / 2
+        r_this = j * r_del - ((i + 1) * r_del / 2)
 
         r_next = r_this + r_del
 
@@ -62,31 +60,56 @@ for i in range(rings):
 
 # diagonal trunk segments
 for i in range(rings - 1):
+    j1 = i * el_per_ring * 2
+    j2 = (i + 1) * el_per_ring * 2
 
-    for j in range(el_per_ring):
+    for j in range(el_per_ring + el_per_ring):
 
-        n1 = (i * el_per_ring + j) * 2
-        n2 = n1 + el_per_ring * 2
-        if i % 2 == 1:
-            n2 -= 2
-        n3 = n2 + 2
+        if (j1+1, j2+1) in [(75, 93), (75, 91), (73, 91), (89, 107), (89, 105), (87, 105), (103, 121), (103, 119), (101, 119), (117, 135), (117, 133), (115, 133)]:
+            d = 6
+        else:
+            d = 2
 
-        n2 = (i + 1) * el_per_ring * 2 + (n2 % (el_per_ring * 2))
-        n3 = (i + 1) * el_per_ring * 2 + (n3 % (el_per_ring * 2))
+        for k in range(1, d):
+            mx = nodes[j1][0] + (nodes[j2][0] - nodes[j1][0]) / d * k
+            my = nodes[j1][1] + (nodes[j2][1] - nodes[j1][1]) / d * k
+            mz = nodes[j1][2] + (nodes[j2][2] - nodes[j1][2]) / d * k
 
-        x1 = (nodes[n1][0] + nodes[n2][0]) / 2
-        y1 = (nodes[n1][1] + nodes[n2][1]) / 2
-        z1 = (nodes[n1][2] + nodes[n2][2]) / 2
+            nodes.append([mx, my, mz])
 
-        x2 = (nodes[n1][0] + nodes[n3][0]) / 2
-        y2 = (nodes[n1][1] + nodes[n3][1]) / 2
-        z2 = (nodes[n1][2] + nodes[n3][2]) / 2
+            elements.append([j1, len(nodes) - 1, j2])
 
-        nodes.append([x1, y1, z1])
-        nodes.append([x2, y2, z2])
+        if j%2 == 0:
+            j2 = (i + 1) * el_per_ring * 2 + ((j2 + 2) % (el_per_ring * 2))
+        else:
+            j1 = i * el_per_ring * 2 + ((j1 + 2) % (el_per_ring * 2))
 
-        elements.append([n1, len(nodes) - 2, n2])
-        elements.append([n1, len(nodes) - 1, n3])
+#for i in range(rings - 1):
+#
+#    for j in range(el_per_ring):
+#
+#        n1 = (i * el_per_ring + j) * 2
+#        n2 = n1 + el_per_ring * 2
+#        if i % 2 == 1:
+#            n2 -= 2
+#        n3 = n2 + 2
+#
+#        n2 = (i + 1) * el_per_ring * 2 + (n2 % (el_per_ring * 2))
+#        n3 = (i + 1) * el_per_ring * 2 + (n3 % (el_per_ring * 2))
+#
+#        x1 = (nodes[n1][0] + nodes[n2][0]) / 2
+#        y1 = (nodes[n1][1] + nodes[n2][1]) / 2
+#        z1 = (nodes[n1][2] + nodes[n2][2]) / 2
+#
+#        x2 = (nodes[n1][0] + nodes[n3][0]) / 2
+#        y2 = (nodes[n1][1] + nodes[n3][1]) / 2
+#        z2 = (nodes[n1][2] + nodes[n3][2]) / 2
+#
+#        nodes.append([x1, y1, z1])
+#        nodes.append([x2, y2, z2])
+#
+#        elements.append([n1, len(nodes) - 2, n2])
+#        elements.append([n1, len(nodes) - 1, n3])
 
 # roots
 for n in [33, 37, 41, 45]:
@@ -99,13 +122,13 @@ for n in [33, 37, 41, 45]:
 
 # midgard
 z_mid = nodes[68][2]
-for n in [69, 71, 73, 75]:
+for n in [75, 77, 79, 65]:
     mn = [-r_mid, nodes[n-1][1], z_mid]
     mm = [(nodes[n-1][0] - r_mid) / 2, nodes[n-1][1], z_mid]
     nodes.append(mm)
     nodes.append(mn)
     elements.append([n-1, len(nodes) - 2, len(nodes) - 1])
-for i in [(282, 284), (284, 286), (286, 288)]:
+for i in [(330, 332), (332, 334), (334, 336)]:
     x_mid = (nodes[i[0]-1][0] + nodes[i[1]-1][0]) / 2
     y_mid = (nodes[i[0]-1][1] + nodes[i[1]-1][1]) / 2
     z_mid = (nodes[i[0]-1][2] + nodes[i[1]-1][2]) / 2
@@ -114,13 +137,16 @@ for i in [(282, 284), (284, 286), (286, 288)]:
     elements.append([i[0]-1, len(nodes) - 1, i[1]-1])
 
 # midgard supports
-for i in [(281, 55), (283, 55), (283, 57), (285, 57), (285, 59), (287, 59)]:#, (282, 37), (284, 39), (286, 41), (288, 43)]:
+for i in [(329, 59), (331, 59), (331, 61), (333, 61), (333, 63), (335, 63)]:#, (282, 37), (284, 39), (286, 41), (288, 43)]:
     x_mid = (nodes[i[0]-1][0] + nodes[i[1]-1][0]) / 2
     y_mid = (nodes[i[0]-1][1] + nodes[i[1]-1][1]) / 2
     z_mid = (nodes[i[0]-1][2] + nodes[i[1]-1][2]) / 2
     s_mid = [x_mid, y_mid, z_mid]
     nodes.append(s_mid)
     elements.append([i[0]-1, len(nodes) - 1, i[1]-1])
+
+# bifrost
+#for i in [(85, 87)]:
 
 fout.write('*NODE,NSET=Nall\n')
 for i, node in enumerate(nodes):
@@ -136,32 +162,32 @@ for i, el in enumerate(elements):
 
     fout.write(el_line)
 
-fout.write('*BOUNDARY\n')
-for i in [1,3,5,7,9,11,13,15,274,276,278,280]:
-    fout.write(str(i) + ',1,3\n')
-
-fout.write('*MATERIAL,NAME=WOOD\n')
-fout.write('*ELASTIC\n')
-fout.write('2.5E8,.038\n')
-
-fout.write('*BEAM SECTION,ELSET=EAll,MATERIAL=WOOD,SECTION=RECT\n')
-fout.write('.125,.292\n')
-
-fout.write('*STEP\n')
-fout.write('*STATIC\n')
-fout.write('*CLOAD\n')
-fout.write('282,3,-1.\n')
-fout.write('284,3,-1.\n')
-fout.write('286,3,-1.\n')
-fout.write('288,3,-1.\n')
-
-fout.write('*EL PRINT,ELSET=Eall\n')
-fout.write('S\n')
-
-fout.write('*EL FILE\n')
-fout.write('S\n')
-
-fout.write('*NODE FILE\n')
-fout.write('U\n')
-
-fout.write('*END STEP\n')
+#fout.write('*BOUNDARY\n')
+#for i in [1,3,5,7,9,11,13,15,274,276,278,280]:
+#    fout.write(str(i) + ',1,3\n')
+#
+#fout.write('*MATERIAL,NAME=WOOD\n')
+#fout.write('*ELASTIC\n')
+#fout.write('2.5E8,.038\n')
+#
+#fout.write('*BEAM SECTION,ELSET=EAll,MATERIAL=WOOD,SECTION=RECT\n')
+#fout.write('.125,.292\n')
+#
+#fout.write('*STEP\n')
+#fout.write('*STATIC\n')
+#fout.write('*CLOAD\n')
+#fout.write('281,3,-1.\n')
+#fout.write('283,3,-1.\n')
+#fout.write('285,3,-1.\n')
+#fout.write('287,3,-1.\n')
+#
+#fout.write('*EL PRINT,ELSET=Eall\n')
+#fout.write('S\n')
+#
+#fout.write('*EL FILE\n')
+#fout.write('S\n')
+#
+#fout.write('*NODE FILE\n')
+#fout.write('U\n')
+#
+#fout.write('*END STEP\n')
