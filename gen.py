@@ -66,14 +66,21 @@ for i in range(rings - 1):
     for j in range(el_per_ring + el_per_ring):
 
         if (j1+1, j2+1) in [(75, 93), (75, 91), (73, 91), (89, 107), (89, 105), (87, 105), (103, 121), (103, 119), (101, 119), (117, 135), (117, 133), (115, 133)]:
-            d = 6
-        else:
-            d = 2
+            for k in range(1, 6):
+                mx = nodes[j1][0] + (nodes[j2][0] - nodes[j1][0]) / 6 * k
+                my = nodes[j1][1] + (nodes[j2][1] - nodes[j1][1]) / 6 * k
+                mz = nodes[j1][2] + (nodes[j2][2] - nodes[j1][2]) / 6 * k
 
-        for k in range(1, d):
-            mx = nodes[j1][0] + (nodes[j2][0] - nodes[j1][0]) / d * k
-            my = nodes[j1][1] + (nodes[j2][1] - nodes[j1][1]) / d * k
-            mz = nodes[j1][2] + (nodes[j2][2] - nodes[j1][2]) / d * k
+                nodes.append([mx, my, mz])
+
+            l = len(nodes)
+            elements.append([j1, l-5, l-4])
+            elements.append([l-4, l-3, l-2])
+            elements.append([l-2, l-1, j2])
+        else:
+            mx = nodes[j1][0] + (nodes[j2][0] - nodes[j1][0]) / 2
+            my = nodes[j1][1] + (nodes[j2][1] - nodes[j1][1]) / 2
+            mz = nodes[j1][2] + (nodes[j2][2] - nodes[j1][2]) / 2
 
             nodes.append([mx, my, mz])
 
@@ -146,7 +153,21 @@ for i in [(329, 59), (331, 59), (331, 61), (333, 61), (333, 63), (335, 63)]:#, (
     elements.append([i[0]-1, len(nodes) - 1, i[1]-1])
 
 # bifrost
-#for i in [(85, 87)]:
+for i in [(224, 229), (221, 226), (90, 91), (250, 255), (247, 252), (104, 105), (276, 281), (273, 278), (118, 119), (302, 307), (299, 304)]:
+    n1 = nodes[i[0]-1]
+    n2 = nodes[i[1]-1]
+    vx = n2[0] - n1[0]
+    vy = n2[1] - n1[1]
+    norm = [vy, -vx]
+    ln = math.sqrt(norm[0] ** 2 + norm[1] ** 2)
+    end_n = [n1[0] + norm[0] / ln * 3, n1[1] + norm[1] / ln * 3, n1[2]]
+    x_mid = (n1[0] + end_n[0]) / 2
+    y_mid = (n1[1] + end_n[1]) / 2
+    z_mid = (n1[2] + end_n[2]) / 2
+
+    nodes.append([x_mid, y_mid, z_mid])
+    nodes.append(end_n)
+    elements.append([i[0]-1, len(nodes)-2, len(nodes)-1])
 
 fout.write('*NODE,NSET=Nall\n')
 for i, node in enumerate(nodes):
@@ -162,32 +183,32 @@ for i, el in enumerate(elements):
 
     fout.write(el_line)
 
-#fout.write('*BOUNDARY\n')
-#for i in [1,3,5,7,9,11,13,15,274,276,278,280]:
-#    fout.write(str(i) + ',1,3\n')
-#
-#fout.write('*MATERIAL,NAME=WOOD\n')
-#fout.write('*ELASTIC\n')
-#fout.write('2.5E8,.038\n')
-#
-#fout.write('*BEAM SECTION,ELSET=EAll,MATERIAL=WOOD,SECTION=RECT\n')
-#fout.write('.125,.292\n')
-#
-#fout.write('*STEP\n')
-#fout.write('*STATIC\n')
-#fout.write('*CLOAD\n')
-#fout.write('281,3,-1.\n')
-#fout.write('283,3,-1.\n')
-#fout.write('285,3,-1.\n')
-#fout.write('287,3,-1.\n')
-#
-#fout.write('*EL PRINT,ELSET=Eall\n')
-#fout.write('S\n')
-#
-#fout.write('*EL FILE\n')
-#fout.write('S\n')
-#
-#fout.write('*NODE FILE\n')
-#fout.write('U\n')
-#
-#fout.write('*END STEP\n')
+fout.write('*BOUNDARY\n')
+for i in [1,3,5,7,9,11,13,15,322,324,326,328]:
+    fout.write(str(i) + ',1,3\n')
+
+fout.write('*MATERIAL,NAME=WOOD\n')
+fout.write('*ELASTIC\n')
+fout.write('2.5E8,.038\n')
+
+fout.write('*BEAM SECTION,ELSET=EAll,MATERIAL=WOOD,SECTION=RECT\n')
+fout.write('.125,.292\n')
+
+fout.write('*STEP\n')
+fout.write('*STATIC\n')
+fout.write('*CLOAD\n')
+fout.write('329,3,-1.\n')
+fout.write('331,3,-1.\n')
+fout.write('333,3,-1.\n')
+fout.write('335,3,-1.\n')
+
+fout.write('*EL PRINT,ELSET=Eall\n')
+fout.write('S\n')
+
+fout.write('*EL FILE\n')
+fout.write('S\n')
+
+fout.write('*NODE FILE\n')
+fout.write('U\n')
+
+fout.write('*END STEP\n')
