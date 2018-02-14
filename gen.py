@@ -68,7 +68,14 @@ for i in range(rings - 1):
 
     for j in range(el_per_ring + el_per_ring):
 
-        if (j1+1, j2+1) in [(75, 93), (75, 91), (73, 91), (89, 107), (89, 105), (87, 105), (103, 121), (103, 119), (101, 119), (117, 135), (117, 133), (115, 133)]:
+        # these elements are cut in thirds to brace bifrost
+        if (j1+1, j2+1) in [ \
+                (75, 93), (75, 91), (73, 91), \
+                (67, 85), (67, 83), (65, 83), \
+                (89, 107), (89, 105), (87, 105), \
+                (81, 99), (81, 97), (95, 97), \
+                (103, 121), (103, 119), (101, 119), \
+                (111, 113), (111, 127), (109, 127)]:
             for k in range(1, 6):
                 mx = nodes[j1][0] + (nodes[j2][0] - nodes[j1][0]) / 6 * k
                 my = nodes[j1][1] + (nodes[j2][1] - nodes[j1][1]) / 6 * k
@@ -94,33 +101,6 @@ for i in range(rings - 1):
         else:
             j1 = i * el_per_ring * 2 + ((j1 + 2) % (el_per_ring * 2))
 
-#for i in range(rings - 1):
-#
-#    for j in range(el_per_ring):
-#
-#        n1 = (i * el_per_ring + j) * 2
-#        n2 = n1 + el_per_ring * 2
-#        if i % 2 == 1:
-#            n2 -= 2
-#        n3 = n2 + 2
-#
-#        n2 = (i + 1) * el_per_ring * 2 + (n2 % (el_per_ring * 2))
-#        n3 = (i + 1) * el_per_ring * 2 + (n3 % (el_per_ring * 2))
-#
-#        x1 = (nodes[n1][0] + nodes[n2][0]) / 2
-#        y1 = (nodes[n1][1] + nodes[n2][1]) / 2
-#        z1 = (nodes[n1][2] + nodes[n2][2]) / 2
-#
-#        x2 = (nodes[n1][0] + nodes[n3][0]) / 2
-#        y2 = (nodes[n1][1] + nodes[n3][1]) / 2
-#        z2 = (nodes[n1][2] + nodes[n3][2]) / 2
-#
-#        nodes.append([x1, y1, z1])
-#        nodes.append([x2, y2, z2])
-#
-#        elements['2x4'].append([n1, len(nodes) - 2, n2])
-#        elements['2x4'].append([n1, len(nodes) - 1, n3])
-
 # roots
 for n in [33, 37, 41, 45]:
     r2dl = math.sqrt(nodes[n-1][0] ** 2 + nodes[n-1][1] ** 2) # root 2D length
@@ -138,7 +118,7 @@ for n in [75, 77, 79, 65]:
     nodes.append(mm)
     nodes.append(mn)
     elements['2x4'].append([n-1, len(nodes) - 2, len(nodes) - 1])
-for i in [(330, 332), (332, 334), (334, 336)]:
+for i in [(354, 356), (356, 358), (358, 360)]:
     mx = (nodes[i[0]-1][0] + nodes[i[1]-1][0]) / 2
     my = (nodes[i[0]-1][1] + nodes[i[1]-1][1]) / 2
     mz = (nodes[i[0]-1][2] + nodes[i[1]-1][2]) / 2
@@ -147,7 +127,7 @@ for i in [(330, 332), (332, 334), (334, 336)]:
     elements['2x4'].append([i[0]-1, len(nodes) - 1, i[1]-1])
 
 # midgard supports
-for i in [(329, 59), (331, 59), (331, 61), (333, 61), (333, 63), (335, 63)]:#, (282, 37), (284, 39), (286, 41), (288, 43)]:
+for i in [(353, 59), (355, 59), (355, 61), (357, 61), (357, 63), (359, 63)]:#, (282, 37), (284, 39), (286, 41), (288, 43)]:
     mx = (nodes[i[0]-1][0] + nodes[i[1]-1][0]) / 2
     my = (nodes[i[0]-1][1] + nodes[i[1]-1][1]) / 2
     mz = (nodes[i[0]-1][2] + nodes[i[1]-1][2]) / 2
@@ -156,7 +136,8 @@ for i in [(329, 59), (331, 59), (331, 61), (333, 61), (333, 63), (335, 63)]:#, (
     elements['2x4'].append([i[0]-1, len(nodes) - 1, i[1]-1])
 
 # bifrost
-for i in [(224, 229), (221, 226), (250, 255), (247, 252), (276, 281), (273, 278), (302, 307), (299, 304)]:
+for i in [(236, 241), (233, 238), (270, 275), (267, 272), (300, 305), (297, 302), \
+        (216, 221), (213, 218), (250, 255), (287, 252), (320, 325), (317, 322)]:
     mx = (nodes[i[0]-1][0] + nodes[i[1]-1][0]) / 2
     my = (nodes[i[0]-1][1] + nodes[i[1]-1][1]) / 2
     mz = (nodes[i[0]-1][2] + nodes[i[1]-1][2]) / 2
@@ -164,10 +145,20 @@ for i in [(224, 229), (221, 226), (250, 255), (247, 252), (276, 281), (273, 278)
     nodes.append(s_mid)
     elements['2x4'].append([i[0]-1, len(nodes)-1, i[1]-1])
 
-for i in [(224, 346, 229), (221, 347, 226), (89, 90, 91), (250, 348, 255), (247, 349, 252), (103, 104, 105), (276, 350, 281), (273, 351, 278), (117, 118, 119), (302, 352, 307), (299, 353, 304)]:
+for i in [(236, 370, 241, 216, 376, 221), \
+        (233, 371, 238, 213, 377, 218), \
+        (89, 90, 91, 81, 82, 83), \
+        (270, 372, 275, 250, 378, 255), \
+        (267, 373, 272, 287, 379, 252), \
+        (103, 104, 105, 111, 112, 97), \
+        (300, 374, 305, 320, 380, 325), \
+        (297, 375, 302, 317, 381, 322)]:
     n1 = nodes[i[0]-1]
     n2 = nodes[i[1]-1]
     n3 = nodes[i[2]-1]
+    #n4 = nodes[i[3]-1]
+    n5 = nodes[i[4]-1]
+    #n6 = nodes[i[5]-1]
     vx = n3[0] - n1[0]
     vy = n3[1] - n1[1]
     norm = [vy, -vx]
@@ -181,24 +172,34 @@ for i in [(224, 346, 229), (221, 347, 226), (89, 90, 91), (250, 348, 255), (247,
     nodes.append(end_n)
     elements['2x10'].append([i[1]-1, len(nodes)-2, len(nodes)-1])
 
+    mx = (n2[0] + n5[0]) / 2
+    my = (n2[1] + n5[1]) / 2
+    mz = (n2[2] + n5[2]) / 2
+    nodes.append([mx, my, mz])
+    elements['2x4'].append([i[1]-1, len(nodes)-1, i[4]-1])
+
 # asgard
-z_asg = nodes[142][2]
-for n in [143, 129, 131, 133]:
-    mn = [-r_asg, nodes[n-1][1], z_asg]
-    mm = [(nodes[n-1][0] - r_asg) / 2, nodes[n-1][1], z_asg]
+z_asg = nodes[113][2]
+ldv = math.sqrt(nodes[116-1][0] ** 2 + nodes[116-1][1] ** 2)
+udv = [nodes[116-1][0] / ldv, nodes[116-1][1] / ldv]
+for n in [113, 115, 117, 119]:
+    node = nodes[n-1]
+    dp = node[0] * udv[0] + node[1] * udv[1]
+    mn = [node[0] + udv[0] * (r_asg - dp), node[1] + udv[1] * (r_asg - dp), z_asg]
+    mm = [(node[0] + mn[0]) / 2, (node[1] + mn[1]) / 2, z_asg]
     nodes.append(mm)
     nodes.append(mn)
     elements['2x4'].append([n-1, len(nodes)-2, len(nodes)-1])
-for i in [(377, 379), (379, 381), (381, 383)]:
+for i in [(407, 409), (409, 411), (411, 413)]:
     mx = (nodes[i[0]-1][0] + nodes[i[1]-1][0]) / 2
     my = (nodes[i[0]-1][1] + nodes[i[1]-1][1]) / 2
     mz = (nodes[i[0]-1][2] + nodes[i[1]-1][2]) / 2
     s_mid = [mx, my, mz]
     nodes.append(s_mid)
-    elements['2x4'].append([i[0]-1, len(nodes) - 1, i[1]-1])
+    elements['2x4'].append([i[0]-1, len(nodes)-1, i[1]-1])
 
 # asgard supports
-for i in [(376, 127), (378, 127), (378, 113), (380, 113), (380, 115), (382, 115)]:
+for i in [(406, 97), (408, 97), (408, 99), (410, 99), (410, 101), (412, 101)]:
     mx = (nodes[i[0]-1][0] + nodes[i[1]-1][0]) / 2
     my = (nodes[i[0]-1][1] + nodes[i[1]-1][1]) / 2
     mz = (nodes[i[0]-1][2] + nodes[i[1]-1][2]) / 2
@@ -240,27 +241,24 @@ fout.write('*STEP\n')
 fout.write('*STATIC\n')
 fout.write('*CLOAD\n')
 # midgard
-fout.write('329,3,-200.\n')
-fout.write('331,3,-200.\n')
-fout.write('333,3,-200.\n')
-fout.write('335,3,-200.\n')
+fout.write('353,3,-200.\n')
+fout.write('355,3,-200.\n')
+fout.write('357,3,-200.\n')
+fout.write('359,3,-200.\n')
 # bifrost
-fout.write('354,3,-200.\n')
-fout.write('356,3,-200.\n')
-fout.write('358,3,-200.\n')
-fout.write('360,3,-200.\n')
-fout.write('362,3,-200.\n')
-fout.write('364,3,-200.\n')
-fout.write('366,3,-200.\n')
-fout.write('368,3,-200.\n')
-fout.write('370,3,-200.\n')
-fout.write('372,3,-200.\n')
-fout.write('374,3,-200.\n')
-# asgard
-fout.write('376,3,-200.\n')
-fout.write('378,3,-200.\n')
-fout.write('380,3,-200.\n')
 fout.write('382,3,-200.\n')
+fout.write('385,3,-200.\n')
+fout.write('388,3,-200.\n')
+fout.write('391,3,-200.\n')
+fout.write('394,3,-200.\n')
+fout.write('397,3,-200.\n')
+fout.write('400,3,-200.\n')
+fout.write('403,3,-200.\n')
+# asgard
+fout.write('406,3,-200.\n')
+fout.write('408,3,-200.\n')
+fout.write('410,3,-200.\n')
+fout.write('412,3,-200.\n')
 
 fout.write('*EL PRINT,ELSET=Eall\n')
 fout.write('S\n')
