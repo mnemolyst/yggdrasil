@@ -13,6 +13,8 @@ nodes = []
 elements = {
         '2x4': [],
         '2x10': [],
+        '4x4': [],
+        'acry': [],
         }
 
 r_top = 2
@@ -108,7 +110,7 @@ for n in [33, 37, 41, 45]:
     rm = [(nodes[n-1][0] + r2dn[0]) / 2, (nodes[n-1][1] + r2dn[1]) / 2, (nodes[n-1][2] + r2dn[2]) / 2] # root midpoint
     nodes.append(rm)
     nodes.append(r2dn)
-    elements['2x4'].append([n-1, len(nodes) - 2, len(nodes) - 1])
+    elements['4x4'].append([n-1, len(nodes) - 2, len(nodes) - 1])
 
 # midgard
 z_mid = nodes[68][2]
@@ -170,13 +172,13 @@ for i in [(236, 370, 241, 216, 376, 221), \
 
     nodes.append([mx, my, mz])
     nodes.append(end_n)
-    elements['2x10'].append([i[1]-1, len(nodes)-2, len(nodes)-1])
+    elements['acry'].append([i[1]-1, len(nodes)-2, len(nodes)-1])
 
     mx = (n2[0] + n5[0]) / 2
     my = (n2[1] + n5[1]) / 2
     mz = (n2[2] + n5[2]) / 2
     nodes.append([mx, my, mz])
-    elements['2x4'].append([i[1]-1, len(nodes)-1, i[4]-1])
+    elements['2x10'].append([i[1]-1, len(nodes)-1, i[4]-1])
 
 # asgard
 z_asg = nodes[113][2]
@@ -207,44 +209,102 @@ for i in [(406, 97), (408, 97), (408, 99), (410, 99), (410, 101), (412, 101)]:
     nodes.append(s_mid)
     elements['2x4'].append([i[0]-1, len(nodes) - 1, i[1]-1])
 
+# entrance to niflheim
+for i in [2, 4, 147, 148, 20]:
+    for idx in range(len(elements['2x4'])):
+        if elements['2x4'][idx][1] == i - 1:
+            del elements['2x4'][idx]
+            break
+
+# entrance to midgard
+for i in [247, 248, 96]:
+    for idx in range(len(elements['2x4'])):
+        if elements['2x4'][idx][1] == i - 1:
+            del elements['2x4'][idx]
+            break
+
+# output ccx input file
 fout.write('*NODE,NSET=Nall\n')
 for i, node in enumerate(nodes):
     node_line = str(i + 1) + ', ' + str(node[0]) + ', ' + str(node[1]) + ', ' + str(node[2]) + '\n'
     fout.write(node_line)
 
-fout.write('*ELEMENT,TYPE=B32,ELSET=EFour\n')
+fout.write('*ELEMENT,TYPE=B32,ELSET=ETwoFour\n')
 for i, el in enumerate(elements['2x4']):
     el_line = str(i + 1) + ', ' + str(el[0] + 1) + ', ' + str(el[1] + 1) + ', ' + str(el[2] + 1) + '\n'
     fout.write(el_line)
 
-fout.write('*ELEMENT,TYPE=B32,ELSET=ETen\n')
-for i, el in enumerate(elements['2x10']):
+fout.write('*ELEMENT,TYPE=B32,ELSET=EFourFour\n')
+for i, el in enumerate(elements['4x4']):
     el_num = i + 1 + len(elements['2x4'])
     el_line = str(el_num) + ', ' + str(el[0] + 1) + ', ' + str(el[1] + 1) + ', ' + str(el[2] + 1) + '\n'
     fout.write(el_line)
 
+fout.write('*ELEMENT,TYPE=B32,ELSET=ETwoTen\n')
+for i, el in enumerate(elements['2x10']):
+    el_num = i + 1 + len(elements['2x4']) + len(elements['4x4'])
+    el_line = str(el_num) + ', ' + str(el[0] + 1) + ', ' + str(el[1] + 1) + ', ' + str(el[2] + 1) + '\n'
+    fout.write(el_line)
+
+fout.write('*ELEMENT,TYPE=B32,ELSET=EAcry\n')
+for i, el in enumerate(elements['acry']):
+    el_num = i + 1 + len(elements['2x4']) + len(elements['4x4']) + len(elements['2x10'])
+    el_line = str(el_num) + ', ' + str(el[0] + 1) + ', ' + str(el[1] + 1) + ', ' + str(el[2] + 1) + '\n'
+    fout.write(el_line)
+
+fout.write('*ELSET,ELSET=EAll,GENERATE\n')
+fout.write('1,' + str(sum([len(elements[x]) for x in elements])) + '\n')
+
 fout.write('*BOUNDARY\n')
-for i in [1,3,5,7,9,11,13,15,322,324,326,328]:
+for i in [1,3,5,7,9,11,13,15,346,348,350,352]:
     fout.write(str(i) + ',1,3\n')
 
 fout.write('*MATERIAL,NAME=WOOD\n')
 fout.write('*ELASTIC\n')
-fout.write('2.5E8,.038\n')
+fout.write('1.8E8,.33\n')
+fout.write('*DENSITY\n')
+fout.write('34.\n')
 
-fout.write('*BEAM SECTION,ELSET=EFour,MATERIAL=WOOD,SECTION=RECT\n')
-fout.write('.125,.292\n')
+fout.write('*MATERIAL,NAME=ACRY\n')
+fout.write('*ELASTIC\n')
+fout.write('6.0E7,.37\n')
+fout.write('*DENSITY\n')
+fout.write('74.3\n')
 
-fout.write('*BEAM SECTION,ELSET=ETen,MATERIAL=WOOD,SECTION=RECT\n')
-fout.write('.125,.771\n')
+fout.write('*BEAM SECTION,ELSET=ETwoFour,MATERIAL=WOOD,SECTION=RECT\n')
+fout.write('.292,.125\n')
+
+fout.write('*BEAM SECTION,ELSET=EFourFour,MATERIAL=WOOD,SECTION=RECT\n')
+fout.write('.292,.292\n')
+
+fout.write('*BEAM SECTION,ELSET=ETwoTen,MATERIAL=WOOD,SECTION=RECT\n')
+fout.write('.771,.125\n')
+
+fout.write('*BEAM SECTION,ELSET=EAcry,MATERIAL=ACRY,SECTION=RECT\n')
+fout.write('.333,.833\n') # 4" x 10"
 
 fout.write('*STEP\n')
 fout.write('*STATIC\n')
+
+fout.write('*DLOAD\n')
+fout.write('EAll,GRAV,3.22E1,0.,0.,-1.\n')
+
 fout.write('*CLOAD\n')
 # midgard
-fout.write('353,3,-200.\n')
-fout.write('355,3,-200.\n')
-fout.write('357,3,-200.\n')
-fout.write('359,3,-200.\n')
+load = math.pi * 9 * 100
+fout.write('354,3,-' + str(load / 4 / 6) + '\n')
+fout.write('356,3,-' + str(load / 4 / 3) + '\n')
+fout.write('358,3,-' + str(load / 4 / 3) + '\n')
+fout.write('360,3,-' + str(load / 4 / 6) + '\n')
+fout.write('353,3,-' + str(load / 2 / 6) + '\n')
+fout.write('355,3,-' + str(load / 2 / 3) + '\n')
+fout.write('357,3,-' + str(load / 2 / 3) + '\n')
+fout.write('359,3,-' + str(load / 2 / 6) + '\n')
+fout.write('75,3,-' + str(load / 4 / 6) + '\n')
+fout.write('77,3,-' + str(load / 4 / 3) + '\n')
+fout.write('79,3,-' + str(load / 4 / 3) + '\n')
+fout.write('65,3,-' + str(load / 4 / 6) + '\n')
+#print 'midgard:', load
 # bifrost
 fout.write('382,3,-200.\n')
 fout.write('385,3,-200.\n')
@@ -255,12 +315,25 @@ fout.write('397,3,-200.\n')
 fout.write('400,3,-200.\n')
 fout.write('403,3,-200.\n')
 # asgard
-fout.write('406,3,-200.\n')
-fout.write('408,3,-200.\n')
-fout.write('410,3,-200.\n')
-fout.write('412,3,-200.\n')
+load = math.pi * 4 * 100
+fout.write('407,3,-' + str(load / 4 / 6) + '\n')
+fout.write('409,3,-' + str(load / 4 / 3) + '\n')
+fout.write('411,3,-' + str(load / 4 / 3) + '\n')
+fout.write('413,3,-' + str(load / 4 / 6) + '\n')
+fout.write('406,3,-' + str(load / 2 / 6) + '\n')
+fout.write('408,3,-' + str(load / 2 / 3) + '\n')
+fout.write('410,3,-' + str(load / 2 / 3) + '\n')
+fout.write('412,3,-' + str(load / 2 / 6) + '\n')
+fout.write('113,3,-' + str(load / 4 / 6) + '\n')
+fout.write('115,3,-' + str(load / 4 / 3) + '\n')
+fout.write('117,3,-' + str(load / 4 / 3) + '\n')
+fout.write('119,3,-' + str(load / 4 / 6) + '\n')
+#print 'asgard:', load
 
-fout.write('*EL PRINT,ELSET=Eall\n')
+fout.write('*EL PRINT,ELSET=ETwoFour\n')
+fout.write('S\n')
+
+fout.write('*EL PRINT,ELSET=ETwoTen\n')
 fout.write('S\n')
 
 fout.write('*EL FILE\n')
