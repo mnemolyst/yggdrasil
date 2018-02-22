@@ -129,13 +129,14 @@ for i in [(354, 356), (356, 358), (358, 360)]:
     elements['2x4'].append([i[0]-1, len(nodes) - 1, i[1]-1])
 
 # midgard supports
-for i in [(353, 59), (355, 59), (355, 61), (357, 61), (357, 63), (359, 63)]:#, (282, 37), (284, 39), (286, 41), (288, 43)]:
+for i in [(353, 93), (355, 93), (355, 95), (357, 95), (357, 81), (359, 81)]:
     mx = (nodes[i[0]-1][0] + nodes[i[1]-1][0]) / 2
     my = (nodes[i[0]-1][1] + nodes[i[1]-1][1]) / 2
     mz = (nodes[i[0]-1][2] + nodes[i[1]-1][2]) / 2
     s_mid = [mx, my, mz]
     nodes.append(s_mid)
-    elements['2x4'].append([i[0]-1, len(nodes) - 1, i[1]-1])
+    if i != (357, 95):
+        elements['2x4'].append([i[0]-1, len(nodes) - 1, i[1]-1])
 
 # bifrost
 for i in [(236, 241), (233, 238), (270, 275), (267, 272), (300, 305), (297, 302), \
@@ -278,10 +279,10 @@ fout.write('*BEAM SECTION,ELSET=EFourFour,MATERIAL=WOOD,SECTION=RECT\n')
 fout.write('.292,.292\n')
 
 fout.write('*BEAM SECTION,ELSET=ETwoTen,MATERIAL=WOOD,SECTION=RECT\n')
-fout.write('.771,.125\n')
+fout.write('.292,.25\n')
 
 fout.write('*BEAM SECTION,ELSET=EAcry,MATERIAL=ACRY,SECTION=RECT\n')
-fout.write('.333,.833\n') # 4" x 10"
+fout.write('.592,.833\n') # 4" x 10"
 
 fout.write('*STEP\n')
 fout.write('*STATIC\n')
@@ -291,7 +292,7 @@ fout.write('EAll,GRAV,3.22E1,0.,0.,-1.\n')
 
 fout.write('*CLOAD\n')
 # midgard
-load = math.pi * 9 * 100
+load = math.pi * 16 * 100
 fout.write('354,3,-' + str(load / 4 / 6) + '\n')
 fout.write('356,3,-' + str(load / 4 / 3) + '\n')
 fout.write('358,3,-' + str(load / 4 / 3) + '\n')
@@ -304,18 +305,19 @@ fout.write('75,3,-' + str(load / 4 / 6) + '\n')
 fout.write('77,3,-' + str(load / 4 / 3) + '\n')
 fout.write('79,3,-' + str(load / 4 / 3) + '\n')
 fout.write('65,3,-' + str(load / 4 / 6) + '\n')
-#print 'midgard:', load
+print 'midgard:', load
 # bifrost
-fout.write('382,3,-200.\n')
-fout.write('385,3,-200.\n')
-fout.write('388,3,-200.\n')
-fout.write('391,3,-200.\n')
-fout.write('394,3,-200.\n')
-fout.write('397,3,-200.\n')
-fout.write('400,3,-200.\n')
-fout.write('403,3,-200.\n')
+fout.write('382,3,-200.\n383,3,-200.\n')
+fout.write('385,3,-200.\n386,3,-200.\n')
+fout.write('388,3,-200.\n389,3,-200.\n')
+fout.write('391,3,-200.\n392,3,-200.\n')
+fout.write('394,3,-200.\n395,3,-200.\n')
+fout.write('397,3,-200.\n398,3,-200.\n')
+fout.write('400,3,-200.\n401,3,-200.\n')
+fout.write('403,3,-200.\n404,3,-200.\n')
+print 'bifrost:', 200 * 16
 # asgard
-load = math.pi * 4 * 100
+load = math.pi * 9 * 100
 fout.write('407,3,-' + str(load / 4 / 6) + '\n')
 fout.write('409,3,-' + str(load / 4 / 3) + '\n')
 fout.write('411,3,-' + str(load / 4 / 3) + '\n')
@@ -328,7 +330,7 @@ fout.write('113,3,-' + str(load / 4 / 6) + '\n')
 fout.write('115,3,-' + str(load / 4 / 3) + '\n')
 fout.write('117,3,-' + str(load / 4 / 3) + '\n')
 fout.write('119,3,-' + str(load / 4 / 6) + '\n')
-#print 'asgard:', load
+print 'asgard:', load
 
 fout.write('*EL PRINT,ELSET=ETwoFour\n')
 fout.write('S\n')
