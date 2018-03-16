@@ -11,12 +11,6 @@ r_del = 2 * math.pi / el_per_ring
 
 nodes = []
 
-#elements = {
-#        '2x4': [],
-#        '2x10': [],
-#        '4x4': [],
-#        'acry': [],
-#        }
 elements = []
 
 orientations = []
@@ -25,6 +19,7 @@ r_top = 2
 r_bot = 3
 r_asg = 6
 r_mid = 8
+bif_w = 3
 
 def max_orient_dotp(n1, n2):
     global orientations
@@ -56,14 +51,14 @@ def add_orientation(n1, n2):
 
     return len(orientations) - 1
 
-def add_element(n1, n2, n3, section, material):
+def add_element(n1, n2, n3, dimensions, material):
     global nodes, elements, orientations
 
     (maxdp, maxidx) = max_orient_dotp(nodes[n1], nodes[n2])
     if abs(maxdp) > .99:
         elements.append({
             'nodes': [n1, n2, n3],
-            'section': section,
+            'dimensions': dimensions,
             'material': material,
             'orientation': maxidx,
         })
@@ -75,7 +70,7 @@ def add_element(n1, n2, n3, section, material):
         orientations.append([dx/dl, dy/dl, dz/dl, 0, 0, 1])
         elements.append({
             'nodes': [n1, n2, n3],
-            'section': section,
+            'dimensions': dimensions,
             'material': material,
             'orientation': len(orientations) - 1,
         })
@@ -127,7 +122,8 @@ for i in range(rings):
 
         elements.append({
             'nodes': el,
-            'section': '.292,.125', # two by four, 3.5" x 1.5"
+            'section': 'RECT',
+            'dimensions': '.292,.125', # two by four, 3.5" x 1.5"
             'material': 'WOOD',
             'orientation': maxidx,
         })
@@ -161,7 +157,8 @@ for i in range(rings - 1):
                 maxidx = add_orientation(nodes[j1], nodes[l-4])
             elements.append({
                 'nodes': [j1, l-5, l-4],
-                'section': '.292,.125', # two by four, 3.5" x 1.5"
+                'section': 'RECT',
+                'dimensions': '.292,.125', # two by four, 3.5" x 1.5"
                 'material': 'WOOD',
                 'orientation': maxidx,
             })
@@ -171,7 +168,8 @@ for i in range(rings - 1):
                 maxidx = add_orientation(nodes[l-4], nodes[l-2])
             elements.append({
                 'nodes': [l-4, l-3, l-2],
-                'section': '.292,.125',
+                'section': 'RECT',
+                'dimensions': '.292,.125',
                 'material': 'WOOD',
                 'orientation': maxidx,
             })
@@ -181,7 +179,8 @@ for i in range(rings - 1):
                 maxidx = add_orientation(nodes[l-2], nodes[j2])
             elements.append({
                 'nodes': [l-2, l-1, j2],
-                'section': '.292,.125',
+                'section': 'RECT',
+                'dimensions': '.292,.125',
                 'material': 'WOOD',
                 'orientation': maxidx,
             })
@@ -197,7 +196,8 @@ for i in range(rings - 1):
                 maxidx = add_orientation(nodes[j1], nodes[j2])
             elements.append({
                 'nodes': [j1, len(nodes) - 1, j2],
-                'section': '.292,.125',
+                'section': 'RECT',
+                'dimensions': '.292,.125',
                 'material': 'WOOD',
                 'orientation': maxidx,
             })
@@ -219,7 +219,8 @@ for n in [33, 37, 41, 45]:
         maxidx = add_orientation(nodes[n-1], nodes[len(nodes) - 1])
     elements.append({
         'nodes': [n-1, len(nodes) - 2, len(nodes) - 1],
-        'section': '.292,.292',
+        'section': 'RECT',
+        'dimensions': '.292,.292',
         'material': 'WOOD',
         'orientation': maxidx,
     })
@@ -236,7 +237,8 @@ for n in [75, 77, 79, 65]:
         maxidx = add_orientation(nodes[n-1], nodes[len(nodes) - 1])
     elements.append({
         'nodes': [n-1, len(nodes) - 2, len(nodes) - 1],
-        'section': '.292,.125',
+        'section': 'RECT',
+        'dimensions': '.292,.125',
         'material': 'WOOD',
         'orientation': maxidx,
     })
@@ -252,7 +254,8 @@ for i in [(354, 356), (356, 358), (358, 360)]:
         maxidx = add_orientation(nodes[i[0]-1], nodes[i[1]-1])
     elements.append({
         'nodes': [i[0]-1, len(nodes) - 1, i[1]-1],
-        'section': '.292,.125',
+        'section': 'RECT',
+        'dimensions': '.292,.125',
         'material': 'WOOD',
         'orientation': maxidx,
     })
@@ -270,7 +273,8 @@ for i in [(353, 59), (355, 59), (355, 61), (357, 61), (357, 63), (359, 63)]:
         maxidx = add_orientation(nodes[i[0]-1], nodes[i[1]-1])
     elements.append({
         'nodes': [i[0]-1, len(nodes) - 1, i[1]-1],
-        'section': '.292,.125',
+        'section': 'RECT',
+        'dimensions': '.292,.125',
         'material': 'WOOD',
         'orientation': maxidx,
     })
@@ -289,7 +293,8 @@ for i in [(236, 241), (233, 238), (270, 275), (267, 272), (300, 305), (297, 302)
         maxidx = add_orientation(nodes[i[0]-1], nodes[i[1]-1])
     elements.append({
         'nodes': [i[0]-1, len(nodes)-1, i[1]-1],
-        'section': '.292,.125',
+        'section': 'RECT',
+        'dimensions': '.292,.125',
         'material': 'WOOD',
         'orientation': maxidx,
     })
@@ -312,7 +317,7 @@ for i in [(236, 370, 241, 216, 376, 221), \
     vy = n3[1] - n1[1]
     norm = [vy, -vx]
     ln = math.sqrt(norm[0] ** 2 + norm[1] ** 2)
-    end_n = [n2[0] + norm[0] / ln * 3, n2[1] + norm[1] / ln * 3, n2[2]]
+    end_n = [n2[0] + norm[0] / ln * bif_w, n2[1] + norm[1] / ln * bif_w, n2[2]]
     mx = (n2[0] + end_n[0]) / 2
     my = (n2[1] + end_n[1]) / 2
     mz = (n2[2] + end_n[2]) / 2
@@ -324,7 +329,8 @@ for i in [(236, 370, 241, 216, 376, 221), \
         maxidx = add_orientation(nodes[i[1]-1], nodes[len(nodes)-1])
     elements.append({
         'nodes': [i[1]-1, len(nodes)-2, len(nodes)-1],
-        'section': '.592,.833',
+        'section': 'BOX',
+        'dimensions': '.592,.833,.08,.08,.08,.08',
         'material': 'ACRY',
         'orientation': maxidx,
     })
@@ -338,7 +344,8 @@ for i in [(236, 370, 241, 216, 376, 221), \
         maxidx = add_orientation(nodes[i[1]-1], nodes[i[4]-1])
     elements.append({
         'nodes': [i[1]-1, len(nodes)-1, i[4]-1],
-        'section': '.292,.125',
+        'section': 'RECT',
+        'dimensions': '.458,.125',
         'material': 'WOOD',
         'orientation': maxidx,
     })
@@ -359,7 +366,8 @@ for n in [113, 115, 117, 119]:
         maxidx = add_orientation(nodes[n-1], nodes[len(nodes)-1])
     elements.append({
         'nodes': [n-1, len(nodes)-2, len(nodes)-1],
-        'section': '.292,.125',
+        'section': 'RECT',
+        'dimensions': '.292,.125',
         'material': 'WOOD',
         'orientation': maxidx,
     })
@@ -374,7 +382,8 @@ for i in [(407, 409), (409, 411), (411, 413)]:
         maxidx = add_orientation(nodes[i[0]-1], nodes[i[1]-1])
     elements.append({
         'nodes': [i[0]-1, len(nodes)-1, i[1]-1],
-        'section': '.292,.125',
+        'section': 'RECT',
+        'dimensions': '.292,.125',
         'material': 'WOOD',
         'orientation': maxidx,
     })
@@ -391,7 +400,8 @@ for i in [(406, 97), (408, 97), (408, 99), (410, 99), (410, 101), (412, 101)]:
         maxidx = add_orientation(nodes[i[0]-1], nodes[i[1]-1])
     elements.append({
         'nodes': [i[0]-1, len(nodes) - 1, i[1]-1],
-        'section': '.292,.125',
+        'section': 'RECT',
+        'dimensions': '.292,.125',
         'material': 'WOOD',
         'orientation': maxidx,
     })
@@ -413,7 +423,7 @@ for i in [(406, 97), (408, 97), (408, 99), (410, 99), (410, 101), (412, 101)]:
 # collate element sets
 elsets = []
 for el in elements:
-    k = (el['section'], el['material'], el['orientation'])
+    k = (el['section'], el['dimensions'], el['material'], el['orientation'])
     if k not in elsets:
         elsets.append(k)
 
@@ -425,7 +435,14 @@ for i, node in enumerate(nodes):
     node_line = str(i + 1) + ', ' + str(node[0]) + ', ' + str(node[1]) + ', ' + str(node[2]) + '\n'
     fout.write(node_line)
 
-fout.write('*ELEMENT,TYPE=B32\n')
+fout.write('*NSET,NSET=NRf\n')
+fout.write('61\n')
+
+fout.write('*TRANSFORM,NSET=NRf\n')
+n = nodes[61 - 1]
+fout.write(str(n[0]) + ',' + str(n[1]) + ',0,0,0,1\n')
+
+fout.write('*ELEMENT,TYPE=B32R\n')
 for i, el in enumerate(elements):
     n = el['nodes']
     el_line = str(i + 1) + ', ' + str(n[0] + 1) + ', ' + str(n[1] + 1) + ', ' + str(n[2] + 1) + '\n'
@@ -435,35 +452,12 @@ for i, elset in enumerate(elsets):
     fout.write('*ELSET,ELSET=ES' + str(i + 1) + '\n')
     line = []
     for j, el in enumerate(elements):
-        if elset == (el['section'], el['material'], el['orientation']):
+        if elset == (el['section'], el['dimensions'], el['material'], el['orientation']):
             line.append(j)
             if len(line) == 16:
                 fout.write(','.join([str(x + 1) for x in line]) + '\n')
                 line = []
     fout.write(','.join([str(x + 1) for x in line]) + '\n')
-
-#fout.write('*ELEMENT,TYPE=B32,ELSET=ETwoFour\n')
-#for i, el in enumerate(elements['2x4']):
-#    el_line = str(i + 1) + ', ' + str(el[0] + 1) + ', ' + str(el[1] + 1) + ', ' + str(el[2] + 1) + '\n'
-#    fout.write(el_line)
-#
-#fout.write('*ELEMENT,TYPE=B32,ELSET=EFourFour\n')
-#for i, el in enumerate(elements['4x4']):
-#    el_num = i + 1 + len(elements['2x4'])
-#    el_line = str(el_num) + ', ' + str(el[0] + 1) + ', ' + str(el[1] + 1) + ', ' + str(el[2] + 1) + '\n'
-#    fout.write(el_line)
-#
-#fout.write('*ELEMENT,TYPE=B32,ELSET=ETwoTen\n')
-#for i, el in enumerate(elements['2x10']):
-#    el_num = i + 1 + len(elements['2x4']) + len(elements['4x4'])
-#    el_line = str(el_num) + ', ' + str(el[0] + 1) + ', ' + str(el[1] + 1) + ', ' + str(el[2] + 1) + '\n'
-#    fout.write(el_line)
-#
-#fout.write('*ELEMENT,TYPE=B32,ELSET=EAcry\n')
-#for i, el in enumerate(elements['acry']):
-#    el_num = i + 1 + len(elements['2x4']) + len(elements['4x4']) + len(elements['2x10'])
-#    el_line = str(el_num) + ', ' + str(el[0] + 1) + ', ' + str(el[1] + 1) + ', ' + str(el[2] + 1) + '\n'
-#    fout.write(el_line)
 
 fout.write('*ELSET,ELSET=EAll,GENERATE\n')
 fout.write('1,' + str(len(elements)) + '\n')
@@ -489,20 +483,8 @@ for i, o in enumerate(orientations):
     fout.write(','.join([str(x) for x in o]) + '\n')
 
 for i, elset in enumerate(elsets):
-    fout.write('*BEAM SECTION,ELSET=ES' + str(i + 1) + ',MATERIAL=' + elset[1] + ',SECTION=RECT,ORIENTATION=O' + str(elset[2] + 1) + '\n')
-    fout.write(elset[0] + '\n')
-
-#fout.write('*BEAM SECTION,ELSET=ETwoFour,MATERIAL=WOOD,SECTION=RECT\n')
-#fout.write('.292,.125\n')
-#
-#fout.write('*BEAM SECTION,ELSET=EFourFour,MATERIAL=WOOD,SECTION=RECT\n')
-#fout.write('.292,.292\n')
-#
-#fout.write('*BEAM SECTION,ELSET=ETwoTen,MATERIAL=WOOD,SECTION=RECT\n')
-#fout.write('.292,.25\n')
-#
-#fout.write('*BEAM SECTION,ELSET=EAcry,MATERIAL=ACRY,SECTION=RECT\n')
-#fout.write('.592,.833\n') # 4" x 10"
+    fout.write('*BEAM SECTION,ELSET=ES' + str(i + 1) + ',MATERIAL=' + elset[2] + ',SECTION=' + elset[0] + ',ORIENTATION=O' + str(elset[3] + 1) + '\n')
+    fout.write(elset[1] + '\n') # dimensions
 
 fout.write('*STEP\n')
 fout.write('*STATIC\n')
@@ -525,43 +507,48 @@ fout.write('75,3,-' + str(load / 4 / 6) + '\n')
 fout.write('77,3,-' + str(load / 4 / 3) + '\n')
 fout.write('79,3,-' + str(load / 4 / 3) + '\n')
 fout.write('65,3,-' + str(load / 4 / 6) + '\n')
-print 'midgard:', load
+#print 'midgard:', load
 # bifrost
-fout.write('382,3,-200.\n383,3,-200.\n')
-fout.write('385,3,-200.\n386,3,-200.\n')
-fout.write('388,3,-200.\n389,3,-200.\n')
-fout.write('391,3,-200.\n392,3,-200.\n')
-fout.write('394,3,-200.\n395,3,-200.\n')
-fout.write('397,3,-200.\n398,3,-200.\n')
-fout.write('400,3,-200.\n401,3,-200.\n')
-fout.write('403,3,-200.\n404,3,-200.\n')
-print 'bifrost:', 200 * 16
+#fout.write('382,3,-200.\n383,3,-200.\n')
+#fout.write('385,3,-200.\n386,3,-200.\n')
+#fout.write('388,3,-200.\n389,3,-200.\n')
+#fout.write('391,3,-200.\n392,3,-200.\n')
+#fout.write('394,3,-200.\n395,3,-200.\n')
+#fout.write('397,3,-200.\n398,3,-200.\n')
+#fout.write('400,3,-200.\n401,3,-200.\n')
+#fout.write('403,3,-200.\n404,3,-200.\n')
+#print 'bifrost:', 200 * 16
 # asgard
-load = math.pi * 9 * 100
-fout.write('407,3,-' + str(load / 4 / 6) + '\n')
-fout.write('409,3,-' + str(load / 4 / 3) + '\n')
-fout.write('411,3,-' + str(load / 4 / 3) + '\n')
-fout.write('413,3,-' + str(load / 4 / 6) + '\n')
-fout.write('406,3,-' + str(load / 2 / 6) + '\n')
-fout.write('408,3,-' + str(load / 2 / 3) + '\n')
-fout.write('410,3,-' + str(load / 2 / 3) + '\n')
-fout.write('412,3,-' + str(load / 2 / 6) + '\n')
-fout.write('113,3,-' + str(load / 4 / 6) + '\n')
-fout.write('115,3,-' + str(load / 4 / 3) + '\n')
-fout.write('117,3,-' + str(load / 4 / 3) + '\n')
-fout.write('119,3,-' + str(load / 4 / 6) + '\n')
-print 'asgard:', load
+#load = math.pi * 9 * 100
+#fout.write('407,3,-' + str(load / 4 / 6) + '\n')
+#fout.write('409,3,-' + str(load / 4 / 3) + '\n')
+#fout.write('411,3,-' + str(load / 4 / 3) + '\n')
+#fout.write('413,3,-' + str(load / 4 / 6) + '\n')
+#fout.write('406,3,-' + str(load / 2 / 6) + '\n')
+#fout.write('408,3,-' + str(load / 2 / 3) + '\n')
+#fout.write('410,3,-' + str(load / 2 / 3) + '\n')
+#fout.write('412,3,-' + str(load / 2 / 6) + '\n')
+#fout.write('113,3,-' + str(load / 4 / 6) + '\n')
+#fout.write('115,3,-' + str(load / 4 / 3) + '\n')
+#fout.write('117,3,-' + str(load / 4 / 3) + '\n')
+#fout.write('119,3,-' + str(load / 4 / 6) + '\n')
+#print 'asgard:', load
 
-fout.write('*EL PRINT,ELSET=ETwoFour\n')
-fout.write('S\n')
-
-fout.write('*EL PRINT,ELSET=ETwoTen\n')
-fout.write('S\n')
+#fout.write('*EL PRINT,ELSET=EAll\n')
+#fout.write('S\n')
 
 fout.write('*EL FILE\n')
 fout.write('S\n')
 
+#fout.write('*NODE PRINT,NSET=NRf\n')
+#fout.write('RF,U\n')
+
 fout.write('*NODE FILE\n')
-fout.write('U\n')
+fout.write('RF,U\n')
 
 fout.write('*END STEP\n')
+
+#fout.write('*STEP,PERTURBATION\n')
+#fout.write('*BUCKLE\n')
+#fout.write('1\n')
+#fout.write('*END STEP\n')
