@@ -35,7 +35,7 @@ mr1 = [-2.932352948060e+00, 0.000000000000e+00, 1.923780000000e+00] # D01G
 mr2 = [-2.932352948060e+00, 0.000000000000e+00, 1.631780000000e+00] # D01H
 mr3 = [-2.063580000000e+00, -2.097400000000e+00, 1.923780000000e+00] # D018
 
-o = [(ml1[0] + ml2[0]) / 2, (ml1[1] + ml2[1]) / 2, (ml1[2] + ml2[2]) / 2]
+insideO = [(ml1[0] + ml2[0]) / 2, (ml1[1] + ml2[1]) / 2, (ml1[2] + ml2[2]) / 2]
 
 def cent(p):
     global ml1, ml2
@@ -84,25 +84,105 @@ def putPnt(p, name):
     global fout
     fout.write('PNT ' + name + ' ' + str(p[0]) + ' ' + str(p[1]) + ' ' + str(p[2]) + '\n')
 
-def putLine(p1, p2):
+def putLine(p1, p2, name, div=2):
     global fout
-    fout.write('LINE ! ' + p1 + ' ' + p2 + ' 2\n')
+    fout.write('LINE ' + name + ' ' + p1 + ' ' + p2 + ' ' + str(div) + '\n')
 
+def putSurf(l1, l2, l3, l4, name):
+    global fout
+    fout.write('SURF ' + name + ' ' + ' '.join((l1, l2, l3, l4)) + '\n')
+
+def putBody(s1, s2, name):
+    global fout
+    fout.write('BODY ! ' + s1 + ' ' + s2 + '\n')
+
+# inner right-side plate
 mrbv = basisVec(mr1, mr2, mr3)
-bv1 = mrbv[0]
-bv2 = mrbv[1]
 
-p1 = abc(o, bv1, 0.5)
-p2 = abc(p1, bv2, 0.6)
-p3 = abc(p2, bv1, -1.0)
-p4 = abc(p3, bv2, -0.6)
+p1 = abc(insideO, mrbv[0], 8./12)
+p2 = abc(p1, mrbv[1], 7./12)
+p3 = abc(p2, mrbv[0], -16./12)
+p4 = abc(p3, mrbv[1], -7./12)
+
+p5 = abc(p1, mrbv[2], -.25/12)
+p6 = abc(p2, mrbv[2], -.25/12)
+p7 = abc(p3, mrbv[2], -.25/12)
+p8 = abc(p4, mrbv[2], -.25/12)
 
 putPnt(p1, 'D101')
 putPnt(p2, 'D102')
 putPnt(p3, 'D103')
 putPnt(p4, 'D104')
 
-putLine('D101', 'D102')
-putLine('D102', 'D103')
-putLine('D103', 'D104')
-putLine('D104', 'D101')
+putPnt(p5, 'D105')
+putPnt(p6, 'D106')
+putPnt(p7, 'D107')
+putPnt(p8, 'D108')
+
+putLine('D101', 'D102', 'L101', 4)
+putLine('D102', 'D103', 'L102', 4)
+putLine('D103', 'D104', 'L103', 4)
+putLine('D104', 'D101', 'L104', 4)
+
+putLine('D105', 'D106', 'L105', 4)
+putLine('D106', 'D107', 'L106', 4)
+putLine('D107', 'D108', 'L107', 4)
+putLine('D108', 'D105', 'L108', 4)
+
+# inner left-side plate
+mlbv = basisVec(ml1, ml2, ml3)
+
+p1 = abc(insideO, mlbv[0], 8./12)
+p2 = abc(p1, mlbv[1], 7./12)
+p3 = abc(p2, mlbv[0], -16./12)
+p4 = abc(p3, mlbv[1], -7./12)
+
+p5 = abc(p1, mlbv[2], .25/12)
+p6 = abc(p2, mlbv[2], .25/12)
+p7 = abc(p3, mlbv[2], .25/12)
+p8 = abc(p4, mlbv[2], .25/12)
+
+putPnt(p1, 'D201')
+putPnt(p2, 'D202')
+putPnt(p3, 'D203')
+putPnt(p4, 'D204')
+
+putPnt(p5, 'D205')
+putPnt(p6, 'D206')
+putPnt(p7, 'D207')
+putPnt(p8, 'D208')
+
+putLine('D201', 'D202', 'L201', 4)
+putLine('D202', 'D203', 'L202', 4)
+putLine('D203', 'D204', 'L203', 4)
+putLine('D204', 'D201', 'L204', 4)
+
+putLine('D205', 'D206', 'L205', 4)
+putLine('D206', 'D207', 'L206', 4)
+putLine('D207', 'D208', 'L207', 4)
+putLine('D208', 'D205', 'L208', 4)
+
+fout.write('INT L105 L205\n')
+fout.write('INT L107 L207\n')
+
+putLine('D101', 'D105', 'L109')
+putLine('D102', 'D106', 'L110')
+putLine('D103', 'D107', 'L111')
+putLine('D104', 'D108', 'L112')
+
+putSurf('L101', 'L102', 'L103', 'L104', 'S101')
+putSurf('L105', 'L106', 'L107', 'L108', 'S102')
+
+putBody('S101', 'S102', 'B101')
+
+putLine('D201', 'D205', 'L209')
+putLine('D202', 'D206', 'L210')
+putLine('D203', 'D207', 'L211')
+putLine('D204', 'D208', 'L212')
+
+putSurf('L201', 'L202', 'L203', 'L204', 'S201')
+putSurf('L205', 'L206', 'L207', 'L208', 'S202')
+
+putBody('S201', 'S202', 'B201')
+
+fout.write('ELTY all he20r\n')
